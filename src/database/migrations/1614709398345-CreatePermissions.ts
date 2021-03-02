@@ -1,11 +1,11 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class CreateProducts1614516407569 implements MigrationInterface {
+export class CreatePermissions1614709398345 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: "products",
+                name: "permissions",
                 columns: [
                     {
                         name: "id",
@@ -13,42 +13,30 @@ export class CreateProducts1614516407569 implements MigrationInterface {
                         isPrimary: true
                     },
                     {
-                        name: "product_name",
+                        name: "name",
                         type: "varchar",
                     },
                     {
-                        name: "price",
-                        type: "numeric",
-                    },
-                    {
-                        name: "bar_code",
+                        name: "description",
                         type: "varchar",
-                    },
-                    {
-                        name: "quantity_stock",
-                        type: "integer",
-                    },
-                    {
-                        name: "quantity_sold",
-                        type: "integer",
                     },
                     {
                         name: "created_at",
                         type: "timestamp",
-                        default: "now()"
+                        default: "now()",
                     },
                     {
                         name: "updated_at",
                         type: "timestamp",
                         default: "now()"
                     },
-                ]
+                ],
             })
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("products");
+        await queryRunner.dropTable("permissions");
     }
 
 }
