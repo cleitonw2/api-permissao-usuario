@@ -8,14 +8,8 @@ import { UsersRepository } from "../repositories/UserRepository";
 class ProductController {
     async register(req: Request, res: Response) {
         const { products } = req.body;
-        const { id } = Object(req.headers)
 
         const productRepository = getCustomRepository(ProductRepository);
-
-        const userRepository = getCustomRepository(UsersRepository);
-
-        const user = await userRepository.findOne(id);
-
 
         products.filter(async (p: {
             product_name: string;
@@ -33,7 +27,7 @@ class ProductController {
             });
             await productRepository.save(product);
         });
-        res.status(200).json({ message: "Successfully registered products" })
+        res.status(200).json({ message: "Successfully registered products" });
     }
 
     async show(req: Request, res: Response) {
@@ -49,6 +43,20 @@ class ProductController {
         });
         res.status(200).json(products);
     }
+
+    async delete(req: Request, res: Response) {
+        const { product_id } = req.params;
+        
+        const productRepository = getCustomRepository(ProductRepository);
+
+        try {
+            await productRepository.delete(
+                { id: product_id }
+            );
+        } catch (error) {
+            throw new AppError("Error when deleting product!");
+        }
+    }
 }
 
-export { ProductController }
+export default new ProductController();

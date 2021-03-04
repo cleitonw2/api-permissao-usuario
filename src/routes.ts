@@ -1,27 +1,29 @@
 import { Router } from 'express';
-import  Auth  from "./middlewares/auth";
-import { UserController } from './controllers/UserController';
-import { ProductController } from './controllers/ProductController';
+import UserController from './controllers/UserController';
+import ProductController from './controllers/ProductController';
 import PrermissionController from "./controllers/PermissionController";
 import RoleController from "./controllers/RoleController";
+import { is } from "./middlewares/permission";
 
 
 const router = Router();
 
-const userController = new UserController();
-const productController = new ProductController();
+const user = "ROLE_USER";
+const admin = "ROLE_ADMIN"
 
-router.post("/users", userController.create);
-router.post("/login", userController.login);
+//public routes
+router.post("/users", UserController.create);
+router.post("/login", UserController.login);
 
-//Permissions
+//register permissions
 router.post("/permissions", PrermissionController.create);
-//roles
 router.post("/roles", RoleController.create);
 
-router.use(Auth.verify);
+router.put("/update_password", is([user, admin]), UserController.updatedPassword);
 
-router.get("/show", userController.show);
-router.post("/register", productController.register);
-router.get("/products", productController.show);
+
+router.get("/show", is([admin]), UserController.show);
+router.post("/register", is([admin]), ProductController.register);
+router.get("/products", is([user, admin]), ProductController.show);
+
 export { router }

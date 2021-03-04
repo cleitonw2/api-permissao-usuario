@@ -4,12 +4,15 @@ import { UsersRepository } from "../repositories/UserRepository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AppError } from "../errors/AppError";
+import { RoleRepository } from "../repositories/RoleRepository";
 
 class UserController {
     async create(req: Request, res: Response) {
-        const { name, email, password } = req.body;
+        const { name, email, password, roles } = req.body;
 
         const userRepository = getCustomRepository(UsersRepository);
+
+        const roleRepository = getCustomRepository(RoleRepository);
 
         const userAlreadyExists = await userRepository.findOne({ email });
 
@@ -18,13 +21,23 @@ class UserController {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
+        const existsRoles = await roleRepository.findByIds(roles);
+
+        if (!existsRoles)
+            throw new AppError("Roles not exists!");
+
         const user = userRepository.create({
             name,
             email,
-            password: passwordHash
+            password: passwordHash,
+            roles: existsRoles,
         });
 
         await userRepository.save(user);
+
+        user.passwordResetExpires = undefined;
+        user.password = undefined;
+        user.passwordResetToken = undefined;
 
         return res.status(200).json(user);
     }
@@ -35,7 +48,10 @@ class UserController {
 
         const userRepository = getCustomRepository(UsersRepository);
 
-        const user = await userRepository.findOne({ email });
+        const user = await userRepository.findOne(
+            { email },
+            { relations: ["roles"] }
+        );
 
         if (!user)
             throw new AppError("User not found!");
@@ -43,10 +59,13 @@ class UserController {
         const validPassword = await bcrypt.compare(password, user.password);
 
         if (!validPassword)
-            throw new AppError("Password invalid!");
+            throw new AppError("Invalid password or username!");
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT, {
-            expiresIn: "10d"
+        const roles = user.roles.map((role) => role.name);
+
+        const token = jwt.sign({ roles }, process.env.JWT, {
+            subject: user.id,
+            expiresIn: "2d"
         });
 
         user.password = undefined;
@@ -68,12 +87,11 @@ class UserController {
             user.passwordResetExpires = undefined;
         })
 
-        res.send(users)
+        res.status(200).json(users)
     }
 
     async updatedPassword(req: Request, res: Response) {
-        const { password, newPassword } = req.body;
-        const { id } = req.params;
+        const { password, newPassword, id } = req.body;
 
         const userRepository = getCustomRepository(UsersRepository);
 
@@ -89,10 +107,16 @@ class UserController {
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
 
-        await userRepository.update(user,{
-            password: passwordHash
-        });
+        try {
+            await userRepository.update(
+                { id: id },
+                { password: passwordHash }
+            );
+            res.status(200).json({ message: "Password successfully updated", id: user.id });
+        } catch (error) {
+            throw new AppError(error);
+        }
     }
 }
 
-export { UserController }
+export default new UserController();
