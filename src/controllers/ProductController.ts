@@ -38,6 +38,23 @@ class ProductController {
         res.status(200).json(products);
     }
 
+    async get(req: Request, res: Response) {
+        const { name } = req.params;
+        try {
+            const productRepository = getCustomRepository(ProductRepository);
+
+            const products = await productRepository.find({
+                where: [{
+                    product_name: name
+                }]
+            });
+
+            res.status(200).json(products);
+        } catch (error) {
+            throw new AppError(error)
+        }
+    }
+
     async delete(req: Request, res: Response) {
         const { id } = req.params;
 
