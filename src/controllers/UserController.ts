@@ -6,10 +6,23 @@ import { RoleRepository } from "../repositories/RoleRepository";
 import moment from "moment";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import * as yup from "yup";
 
 class UserController {
     async create(req: Request, res: Response) {
         const { name, email, password, roles } = req.body;
+
+        const schema = yup.object().shape({
+            name: yup.string().required(),
+            password: yup.string().length(6).required(),
+            email: yup.string().email().required(),
+        });
+
+        try {
+            await schema.validate(req.body, { abortEarly: false });
+        } catch (error) {
+            throw new AppError(error);
+        }
 
         const userRepository = getCustomRepository(UsersRepository);
 
