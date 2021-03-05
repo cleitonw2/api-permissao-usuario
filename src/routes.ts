@@ -26,4 +26,7 @@ router.get("/show", is([admin]), UserController.show);
 router.post("/register", is([admin]), ProductController.register);
 router.get("/products", is([user, admin]), ProductController.show);
 
+router.delete("/product/:id", is([admin]), ProductController.delete);
+router.delete("/user/:id", is([admin, user]), UserController.delete);
+
 export { router }

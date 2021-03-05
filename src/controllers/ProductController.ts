@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import { AppError } from "../errors/AppError";
 import { ProductRepository } from "../repositories/ProductRepository";
-import { UsersRepository } from "../repositories/UserRepository";
 
 
 class ProductController {
@@ -31,28 +30,24 @@ class ProductController {
     }
 
     async show(req: Request, res: Response) {
-        const { product_name } = req.query;
 
         const productRepository = getCustomRepository(ProductRepository);
-        if (!product_name) {
-            const products = await productRepository.find();
-            res.status(200).json(products);
-        }
-        const products = await productRepository.findOne({
-            product_name: String(product_name)
-        });
+
+        const products = await productRepository.find();
+
         res.status(200).json(products);
     }
 
     async delete(req: Request, res: Response) {
-        const { product_id } = req.params;
-        
+        const { id } = req.params;
+
         const productRepository = getCustomRepository(ProductRepository);
 
         try {
             await productRepository.delete(
-                { id: product_id }
+                { id }
             );
+            res.status(200).json("Product deleting successfully")
         } catch (error) {
             throw new AppError("Error when deleting product!");
         }

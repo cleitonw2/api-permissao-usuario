@@ -117,6 +117,27 @@ class UserController {
             throw new AppError(error);
         }
     }
+
+    async delete(req: Request, res: Response) {
+        const { id } = req.params;
+        const { password } = req.body;
+
+        const userRepository = getCustomRepository(UsersRepository);
+
+        const user = await userRepository.findOne(id);
+
+        const validPassword = await bcrypt.compare(password, user.password);
+
+        if (!validPassword)
+            throw new AppError("Invalid password or username!");
+
+        try {
+            await userRepository.delete(id);
+            res.status(200).json("User successfully deleted!");
+        } catch (error) {
+            throw new AppError("It was not possible to delet the user!");
+        }
+    }
 }
 
 export default new UserController();
