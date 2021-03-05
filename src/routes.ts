@@ -3,6 +3,7 @@ import UserController from './controllers/UserController';
 import ProductController from './controllers/ProductController';
 import PrermissionController from "./controllers/PermissionController";
 import RoleController from "./controllers/RoleController";
+import SendMailController from "./controllers/SendMailController";
 import { is } from "./middlewares/permission";
 
 
@@ -11,16 +12,16 @@ const router = Router();
 const user = "ROLE_USER";
 const admin = "ROLE_ADMIN"
 
-//public routes
 router.post("/users", UserController.create);
 router.post("/login", UserController.login);
+router.patch("/forgot_password", SendMailController.forgot_password);
+router.post("/reset_password", UserController.reset_password);
 
 //register permissions
 router.post("/permissions", PrermissionController.create);
 router.post("/roles", RoleController.create);
 
-router.put("/update_password", is([user, admin]), UserController.updatedPassword);
-
+router.patch("/update_password", is([user, admin]), UserController.updatedPassword);
 
 router.get("/show", is([admin]), UserController.show);
 router.post("/register", is([admin]), ProductController.register);

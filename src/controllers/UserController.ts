@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import { UsersRepository } from "../repositories/UserRepository";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { AppError } from "../errors/AppError";
 import { RoleRepository } from "../repositories/RoleRepository";
+import moment from "moment";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 class UserController {
     async create(req: Request, res: Response) {
@@ -136,6 +137,41 @@ class UserController {
             res.status(200).json("User successfully deleted!");
         } catch (error) {
             throw new AppError("It was not possible to delet the user!");
+        }
+    }
+
+    async reset_password(req: Request, res: Response) {
+        const { email, token, password } = req.body;
+
+        const userRepository = getCustomRepository(UsersRepository);
+
+        const user = await userRepository.findOne({ email });
+
+        if (!user)
+            throw new AppError("User not found!", 401);
+
+        if (token !== user.passwordResetToken)
+            throw new AppError("Token invalid!");
+
+        const now = moment().format('YYYY-MM-DD HH:mm');
+
+        if (now > moment(user.passwordResetExpires).format('YYYY-MM-DD HH:mm'))
+            throw new AppError("Token expired, generate a new one");
+
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        try {
+            await userRepository.update(
+                { id: user.id },
+                {
+                    password: passwordHash,
+                    passwordResetToken: null,
+                    passwordResetExpires: null,
+                }
+            );
+            res.status(200).json({ message: "Password successfully updated" });
+        } catch (error) {
+            throw new AppError(error);
         }
     }
 }
