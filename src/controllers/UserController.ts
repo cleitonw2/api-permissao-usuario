@@ -93,7 +93,7 @@ class UserController {
 
         const userRepository = getCustomRepository(UsersRepository);
 
-        const users = await userRepository.find();
+        const users = await userRepository.find({ relations: ["roles"] });
 
         users.filter(user => {
             user.password = undefined;
