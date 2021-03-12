@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { v4 as uuid } from 'uuid';
 import { Role } from "./Role";
+import { Seller } from "./Seller";
 
 @Entity("users")
 class User {
@@ -49,6 +50,11 @@ class User {
         inverseJoinColumns: [{ name: "role_id" }],
     })
     roles: Role[];
+
+    @ManyToMany(() => Seller, seller => seller.users)
+    @JoinTable()
+    seller: Seller[];
+
 }
 
 export { User }

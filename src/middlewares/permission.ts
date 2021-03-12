@@ -23,6 +23,8 @@ async function decoder(req: Request): Promise<User> {
         relations: ["roles"],
     });
 
+    req.header = payload.sub;
+
     return user;
 }
 
@@ -32,7 +34,7 @@ function is(role: String[]) {
         res: Response,
         next: NextFunction
     ) => {
-        const user = await decoder(req);
+        const  user = await decoder(req);
 
         const userRoles = user.roles.map((role) => role.name);
 

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { v4 as uuid } from 'uuid';
+import { Seller } from "./Seller";
 
 @Entity("products")
 class Product {
@@ -33,6 +34,11 @@ class Product {
 
     @CreateDateColumn()
     updated_at: Date;
+
+    
+    @ManyToMany(() => Seller, seller => seller.products)
+    @JoinTable()
+    seller: Seller[];
 }
 
 export { Product }

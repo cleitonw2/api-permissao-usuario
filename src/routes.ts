@@ -4,6 +4,7 @@ import ProductController from './controllers/ProductController';
 import PrermissionController from "./controllers/PermissionController";
 import RoleController from "./controllers/RoleController";
 import SendMailController from "./controllers/SendMailController";
+import SellerController from "./controllers/SellerController";
 import { is } from "./middlewares/permission";
 
 
@@ -35,5 +36,7 @@ router.get("/products", is([user, admin]), ProductController.show);
 router.get("/products/:name", is([user, admin]), ProductController.get);
 router.delete("/product/:id", is([admin]), ProductController.delete);
 router.post("/sell_product", is([user, admin]), ProductController.sellProduct);
+
+router.get("/:user_id", is([admin, user]), SellerController.getSeller);
 
 export { router }

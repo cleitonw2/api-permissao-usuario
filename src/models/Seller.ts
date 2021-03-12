@@ -38,13 +38,13 @@ class Seller {
     @CreateDateColumn()
     updated_at: Date;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, user => user.seller)
     @JoinColumn({ name: "user_id" })
-    user: User
+    users: User[]
 
-    @ManyToMany(() => Product)
+    @ManyToOne(() => Product, product => product.seller)
     @JoinColumn({ name: "product_id" })
-    product: Product
+    products: Product[]
 }
 
 export { Seller }
