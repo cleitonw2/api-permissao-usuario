@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getCustomRepository, UsingJoinColumnOnlyOnOneSideAllowedError } from "typeorm";
+import { getCustomRepository } from "typeorm";
 import { AppError } from "../errors/AppError";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { SellerRepository } from "../repositories/SellerRepository";
@@ -27,7 +27,7 @@ class ProductController {
             });
             await productRepository.save(product);
         });
-        res.status(200).json({ message: "Successfully registered products" });
+        return res.status(200).json({ message: "Successfully registered products" });
     }
 
     async show(req: Request, res: Response) {
@@ -36,7 +36,7 @@ class ProductController {
 
         const products = await productRepository.find();
 
-        res.status(200).json(products);
+        return res.status(200).json(products);
     }
 
     async get(req: Request, res: Response) {
@@ -50,7 +50,7 @@ class ProductController {
                 }]
             });
 
-            res.status(200).json(products);
+            return res.status(200).json(products);
         } catch (error) {
             throw new AppError(error);
         }
@@ -65,14 +65,16 @@ class ProductController {
             await productRepository.delete(
                 { id }
             );
-            res.status(200).json("Product deleting successfully")
+            return res.status(200).json("Product deleting successfully")
         } catch (error) {
             throw new AppError("Error when deleting product!");
         }
     }
 
     async sellProduct(req: Request, res: Response) {
-        const { unity_sold, product_id, user_id } = req.body;
+        const { unity_sold, product_id } = req.body;
+        const id = req.header;
+        const user_id = String(id);
 
         const productRepository = getCustomRepository(ProductRepository);
         const sellerRepository = getCustomRepository(SellerRepository);
@@ -115,7 +117,7 @@ class ProductController {
                 await sellerRepository.save(seller);
             }
 
-            res.status(200).json("ok");
+            return res.status(200).json("ok");
         } catch (error) {
             throw new AppError(error);
         }

@@ -23,7 +23,7 @@ class SellerController {
             );
 
             const products = [];
-            const valueSold = []; 
+            const valueSold = [];
             for (let s of sellerProducts) {
                 let product = await productRepository.findOne({ id: s.product_id });
                 let unity_sold_by_seller = s.unity_sold;
@@ -41,9 +41,9 @@ class SellerController {
                 totalValueSold += v
             }
 
-            products.push({ products_total_value_sold: totalValueSold});
+            products.push({ products_total_value_sold: totalValueSold });
 
-            res.status(200).json({
+            return res.status(200).json({
                 user,
                 products
             });

@@ -42,7 +42,7 @@ class SendMailController {
 
             await SendMailService.execute(email, variables.title, variables, npsPath);
 
-            res.status(200).json({ message: "Email sent successfully!" });
+            return res.status(200).json({ message: "Email sent successfully!" });
         } catch (error) {
             throw new AppError(error);
         }

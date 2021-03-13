@@ -19,7 +19,7 @@ router.post("/login", UserController.login);
 router.post("/reset_password", UserController.reset_password);
 router.patch("/update_password", is([user, admin]), UserController.updatedPassword);
 router.get("/show", is([admin]), UserController.show);
-router.delete("/user/:id", is([admin, user]), UserController.delete);
+router.delete("/user", is([admin, user]), UserController.delete);
 
 //email
 router.patch("/forgot_password", SendMailController.forgot_password);
@@ -37,6 +37,6 @@ router.get("/products/:name", is([user, admin]), ProductController.get);
 router.delete("/product/:id", is([admin]), ProductController.delete);
 router.post("/sell_product", is([user, admin]), ProductController.sellProduct);
 
-router.get("/:user_id", is([admin, user]), SellerController.getSeller);
+router.get("/:user_id", is([admin]), SellerController.getSeller);
 
 export { router }

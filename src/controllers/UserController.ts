@@ -86,7 +86,7 @@ class UserController {
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
 
-        res.status(200).json({ user: user, token: token });
+        return res.status(200).json({ user: user, token: token });
     }
 
     async show(req: Request, res: Response) {
@@ -99,13 +99,14 @@ class UserController {
             user.password = undefined;
             user.passwordResetToken = undefined;
             user.passwordResetExpires = undefined;
-        })
+        });
 
-        res.status(200).json(users)
+        return res.status(200).json(users);
     }
 
     async updatedPassword(req: Request, res: Response) {
-        const { password, newPassword, id } = req.body;
+        const { password, newPassword} = req.body;
+        const id = String(req.header);
 
         const userRepository = getCustomRepository(UsersRepository);
 
@@ -126,14 +127,14 @@ class UserController {
                 { id: id },
                 { password: passwordHash }
             );
-            res.status(200).json({ message: "Password successfully updated", id: user.id });
+            return res.status(200).json({ message: "Password successfully updated", id: user.id });
         } catch (error) {
             throw new AppError(error);
         }
     }
 
     async delete(req: Request, res: Response) {
-        const { id } = req.params;
+        const id = String(req.header);
         const { password } = req.body;
 
         const userRepository = getCustomRepository(UsersRepository);
@@ -147,7 +148,7 @@ class UserController {
 
         try {
             await userRepository.delete(id);
-            res.status(200).json("User successfully deleted!");
+            return res.status(200).json("User successfully deleted!");
         } catch (error) {
             throw new AppError("It was not possible to delet the user!");
         }
@@ -182,7 +183,7 @@ class UserController {
                     passwordResetExpires: null,
                 }
             );
-            res.status(200).json({ message: "Password successfully updated" });
+            return res.status(200).json({ message: "Password successfully updated" });
         } catch (error) {
             throw new AppError(error);
         }
