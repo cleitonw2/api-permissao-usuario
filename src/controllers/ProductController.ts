@@ -82,7 +82,9 @@ class ProductController {
         try {
             const product = await productRepository.findOne({ id: product_id });
 
-            if (product.quantity_stock === 0 || unity_sold > product.quantity_stock)
+            const emptyStock = 0;
+
+            if (product.quantity_stock === emptyStock || unity_sold > product.quantity_stock)
                 throw new AppError("No product in stock!");
 
             let stock = Number(product.quantity_stock) - unity_sold;

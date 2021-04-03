@@ -44,7 +44,7 @@ class SendMailController {
 
             return res.status(200).json({ message: "Email sent successfully!" });
         } catch (error) {
-            console.log(error)
+
             throw new AppError(error);
         }
     }
