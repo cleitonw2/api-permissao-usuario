@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import { AppError } from "../errors/AppError";
 import { UsersRepository } from "../repositories/UserRepository";
-import SendMailService from "../services/SendMailService";
 import { resolve } from "path";
 import crypto from "crypto";
 import moment from "moment";
+import Queue from "../lib/Queue";
 
 class SendMailController {
     async forgot_password(req: Request, res: Response) {
@@ -40,10 +40,11 @@ class SendMailController {
                 }
             );
 
-            await SendMailService.execute(email, variables.title, variables, npsPath);
+            await Queue.add('RegistrationMail', { email, variables, npsPath });
 
             return res.status(200).json({ message: "Email sent successfully!" });
         } catch (error) {
+            console.log(error)
             throw new AppError(error);
         }
     }

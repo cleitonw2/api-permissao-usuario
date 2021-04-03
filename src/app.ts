@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express, { NextFunction, Request as Req, Response as Res } from "express";
 import "express-async-errors";
-import createConnection from "./database";
+import createConnection from "./config/database";
 import { router } from "./routes";
 import { AppError } from "./errors/AppError";
 
