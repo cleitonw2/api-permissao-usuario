@@ -1,7 +1,7 @@
 import SendMailService from "../services/SendMailService";
 
 export default {
-    key: 'RegistrationMail',
+    key: 'SendMail',
     options: {},
     async handle({ data }) {
         const { email, variables, npsPath } = data;

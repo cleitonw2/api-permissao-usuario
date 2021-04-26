@@ -40,7 +40,7 @@ class SendMailController {
                 }
             );
 
-            await Queue.add('RegistrationMail', { email, variables, npsPath });
+            await Queue.add('SendMail', { email, variables, npsPath });
 
             return res.status(200).json({ message: "Email sent successfully!" });
         } catch (error) {

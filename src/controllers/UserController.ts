@@ -3,6 +3,7 @@ import { getCustomRepository } from "typeorm";
 import { UsersRepository } from "../repositories/UserRepository";
 import { AppError } from "../errors/AppError";
 import { RoleRepository } from "../repositories/RoleRepository";
+import { UserService } from "../services/UserService";
 import moment from "moment";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -24,34 +25,9 @@ class UserController {
             throw new AppError(error);
         }
 
-        const userRepository = getCustomRepository(UsersRepository);
+        const userService = new UserService();
 
-        const roleRepository = getCustomRepository(RoleRepository);
-
-        const userAlreadyExists = await userRepository.findOne({ email });
-
-        if (userAlreadyExists)
-            throw new AppError("User already exists!");
-
-        const passwordHash = await bcrypt.hash(password, 10);
-
-        const existsRoles = await roleRepository.findByIds(roles);
-
-        if (!existsRoles)
-            throw new AppError("Roles not exists!");
-
-        const user = userRepository.create({
-            name,
-            email,
-            password: passwordHash,
-            roles: existsRoles,
-        });
-
-        await userRepository.save(user);
-
-        user.passwordResetExpires = undefined;
-        user.password = undefined;
-        user.passwordResetToken = undefined;
+        const user = await userService.create({ name, email, password, roles });
 
         return res.status(200).json(user);
     }
@@ -105,7 +81,7 @@ class UserController {
     }
 
     async updatedPassword(req: Request, res: Response) {
-        const { password, newPassword} = req.body;
+        const { password, newPassword } = req.body;
         const id = String(req.header);
 
         const userRepository = getCustomRepository(UsersRepository);
