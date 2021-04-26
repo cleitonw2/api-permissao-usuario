@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
-import { getCustomRepository } from "typeorm";
-import { UsersRepository } from "../repositories/UserRepository";
 import { AppError } from "../errors/AppError";
-import { RoleRepository } from "../repositories/RoleRepository";
 import { UserService } from "../services/UserService";
-import moment from "moment";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import * as yup from "yup";
 
+
+const userService = () => new UserService();
+
 class UserController {
+
     async create(req: Request, res: Response) {
         const { name, email, password, roles } = req.body;
 
@@ -22,12 +20,10 @@ class UserController {
         try {
             await schema.validate(req.body, { abortEarly: false });
         } catch (error) {
-            throw new AppError(error);
+            throw new AppError(error.message);
         }
 
-        const userService = new UserService();
-
-        const user = await userService.create({ name, email, password, roles });
+        const user = await userService().create({ name, email, password, roles });
 
         return res.status(200).json(user);
     }
@@ -36,46 +32,16 @@ class UserController {
 
         const { email, password } = req.body;
 
-        const userRepository = getCustomRepository(UsersRepository);
-
-        const user = await userRepository.findOne(
-            { email },
-            { relations: ["roles"] }
-        );
-
-        if (!user)
-            throw new AppError("User not found!");
-
-        const validPassword = await bcrypt.compare(password, user.password);
-
-        if (!validPassword)
-            throw new AppError("Invalid password or username!");
-
-        const roles = user.roles.map((role) => role.name);
-
-        const token = jwt.sign({ roles }, process.env.JWT, {
-            subject: user.id,
-            expiresIn: "2d"
-        });
-
-        user.password = undefined;
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
+        const { user, token } = await userService().login(email, password);
 
         return res.status(200).json({ user: user, token: token });
     }
 
     async show(req: Request, res: Response) {
 
-        const userRepository = getCustomRepository(UsersRepository);
+        const userService = new UserService();
 
-        const users = await userRepository.find({ relations: ["roles"] });
-
-        users.filter(user => {
-            user.password = undefined;
-            user.passwordResetToken = undefined;
-            user.passwordResetExpires = undefined;
-        });
+        const users = await userService.showUsers();
 
         return res.status(200).json(users);
     }
@@ -84,85 +50,26 @@ class UserController {
         const { password, newPassword } = req.body;
         const id = String(req.header);
 
-        const userRepository = getCustomRepository(UsersRepository);
+        const userID = await userService().updatePassword(password, newPassword, id);
 
-        const user = await userRepository.findOne(id);
-
-        if (!user)
-            throw new AppError("User not found!");
-
-        const validPassword = await bcrypt.compare(password, user.password);
-
-        if (!validPassword)
-            throw new AppError("Password invalid!");
-
-        const passwordHash = await bcrypt.hash(newPassword, 10);
-
-        try {
-            await userRepository.update(
-                { id: id },
-                { password: passwordHash }
-            );
-            return res.status(200).json({ message: "Password successfully updated", id: user.id });
-        } catch (error) {
-            throw new AppError(error);
-        }
+        return res.status(200).json({ message: "Password successfully updated", id: userID });
     }
 
     async delete(req: Request, res: Response) {
         const id = String(req.header);
         const { password } = req.body;
 
-        const userRepository = getCustomRepository(UsersRepository);
+        const user = await userService().deleteUser(password, id);
 
-        const user = await userRepository.findOne(id);
-
-        const validPassword = await bcrypt.compare(password, user.password);
-
-        if (!validPassword)
-            throw new AppError("Invalid password or username!");
-
-        try {
-            await userRepository.delete(id);
-            return res.status(200).json("User successfully deleted!");
-        } catch (error) {
-            throw new AppError("It was not possible to delet the user!");
-        }
+        return res.status(200).json("User successfully deleted!");
     }
 
     async reset_password(req: Request, res: Response) {
         const { email, token, password } = req.body;
 
-        const userRepository = getCustomRepository(UsersRepository);
+        await userService().resetPassword(email, token, password);
 
-        const user = await userRepository.findOne({ email });
-
-        if (!user)
-            throw new AppError("User not found!", 401);
-
-        if (token !== user.passwordResetToken)
-            throw new AppError("Token invalid!");
-
-        const now = moment().format('YYYY-MM-DD HH:mm');
-
-        if (now > moment(user.passwordResetExpires).format('YYYY-MM-DD HH:mm'))
-            throw new AppError("Token expired, generate a new one");
-
-        const passwordHash = await bcrypt.hash(password, 10);
-
-        try {
-            await userRepository.update(
-                { id: user.id },
-                {
-                    password: passwordHash,
-                    passwordResetToken: null,
-                    passwordResetExpires: null,
-                }
-            );
-            return res.status(200).json({ message: "Password successfully updated" });
-        } catch (error) {
-            throw new AppError(error);
-        }
+        return res.status(200).json({ message: "Password successfully updated" });
     }
 }
 
