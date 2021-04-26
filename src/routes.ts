@@ -37,6 +37,6 @@ router.get("/products/:name", is([user, admin]), ProductController.get);
 router.delete("/product/:id", is([admin]), ProductController.delete);
 router.post("/sell_product", is([user, admin]), ProductController.sellProduct);
 
-router.get("/:user_id", is([admin]), SellerController.getSeller);
+router.get("/:user_id", is([admin]), SellerController.getSellerID);
 
 export { router }
