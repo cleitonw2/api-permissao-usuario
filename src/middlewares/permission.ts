@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { decode } from "jsonwebtoken";
+import { decode, verify } from "jsonwebtoken";
 import { getCustomRepository } from "typeorm";
 import { UsersRepository } from "../repositories/UserRepository";
 import { User } from "../models/User";
 import { AppError } from "../errors/AppError";
+import dotenv from "dotenv";
+dotenv.config();
+
+const secret = process.env.JWT
 
 async function decoder(req: Request): Promise<User> {
     const token = req.headers['access-token'];
@@ -11,13 +15,14 @@ async function decoder(req: Request): Promise<User> {
     if (!token)
         throw new AppError("Unauthorized: no token provided!");
 
+    verify(String(token), secret, (error) => {
+        if (error)
+            throw new AppError(String(error));
+    });
+
     const userRepository = getCustomRepository(UsersRepository);
 
     const payload = decode(String(token));
-
-    if (!payload) {
-        throw new AppError("Token invalid!");
-    }
 
     const user = await userRepository.findOne(payload.sub, {
         relations: ["roles"],
@@ -34,7 +39,7 @@ function is(role: String[]) {
         res: Response,
         next: NextFunction
     ) => {
-        const  user = await decoder(req);
+        const user = await decoder(req);
 
         const userRoles = user.roles.map((role) => role.name);
 
