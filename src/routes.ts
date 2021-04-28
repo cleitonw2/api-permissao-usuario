@@ -31,11 +31,12 @@ router.post("/permissions", PrermissionController.create);
 router.post("/roles", RoleController.create);
 
 //product
-router.post("/register", is([admin]), ProductController.register);
-router.get("/products", is([user, admin]), ProductController.show);
-router.get("/products/:name", is([user, admin]), ProductController.get);
+router.post("/products/register", is([admin]), ProductController.registerProducts);
+router.get("/product/:product_id", is([user, admin]), ProductController.showProductByID);
+router.get("/products", is([user, admin]), ProductController.showProducts);
+router.get("/products/:product_name", is([user, admin]), ProductController.showProductsByName);
 router.delete("/product/:id", is([admin]), ProductController.delete);
-router.post("/sell_product", is([user, admin]), ProductController.sellProduct);
+router.post("/product/sell_product", is([user, admin]), ProductController.sellProduct);
 
 router.get("/:user_id", is([admin]), SellerController.getSellerID);
 
