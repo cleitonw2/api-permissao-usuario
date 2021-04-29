@@ -26,6 +26,8 @@ router.patch("/forgot_password", SendMailController.forgot_password);
 
 //permission
 router.post("/permissions", PrermissionController.create);
+router.put("/permissions/:permission_id", PrermissionController.update);
+router.delete("/permissions/:permission_id", PrermissionController.delete);
 
 //role
 router.post("/roles", RoleController.create);

@@ -1,27 +1,30 @@
 import { Request, Response } from "express";
-import { getCustomRepository } from "typeorm";
-import { AppError } from "../errors/AppError";
-import { PermissionRepository } from "../repositories/PermissionRepository";
+import { PermissionService } from "../services/PermissionService";
+
+const permissionService = () => new PermissionService();
 
 class PrermissionController {
     async create(req: Request, res: Response) {
         const { name, description } = req.body;
 
-        const permissionRepository = getCustomRepository(PermissionRepository);
-
-        const existPermission = await permissionRepository.findOne({ name });
-
-        if (existPermission)
-            throw new AppError("Permission already exists!");
-
-        const permission = permissionRepository.create({
-            name,
-            description,
-        });
-
-        await permissionRepository.save(permission);
+        const permission = await permissionService().createPermission(name, description);
 
         return res.status(200).json(permission);
+    }
+
+    async update(req: Request, res: Response) {
+        const { name, description } = req.body;
+        const { permission_id } = req.params;
+        await permissionService().updatePermission(permission_id, name, description);
+        res.json("ok")
+    }
+
+    async delete(req: Request, res: Response) {
+        const { permission_id } = req.params;
+       
+        await permissionService().delete(permission_id);
+
+        return res.json("permission deleted");
     }
 }
 
