@@ -139,7 +139,7 @@ class UserService {
 
     async deleteUser(password: string, id: string) {
         const user = await this.userExists("", id);
-        console.log(user)
+
         if (!user)
             throw new AppError("User not found!");
 
