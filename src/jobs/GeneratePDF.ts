@@ -5,7 +5,8 @@ export default {
     options: {},
     async handle({ data }) {
         const { html, downloadPath } = data;
-        pdf.create(html, {}).toFile(downloadPath, (err, res) => {
+        
+        pdf.create(html, { border: {top: "50px", bottom: "50px"}}).toFile(downloadPath, (err, res) => {
             if (err)
                 console.log(err)
             else
