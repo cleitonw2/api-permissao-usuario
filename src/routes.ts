@@ -19,6 +19,7 @@ router.post("/login", UserController.login);
 router.post("/reset_password", UserController.reset_password);
 router.patch("/update_password", is([user, admin]), UserController.updatedPassword);
 router.get("/show", is([admin]), UserController.show);
+router.get("/show/id", is([admin, user]), UserController.showUserByID);
 router.delete("/user", is([admin, user]), UserController.delete);
 
 //email

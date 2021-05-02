@@ -112,6 +112,14 @@ class UserService {
         return users;
     }
 
+    async showUserByID(id: string) {
+        const user = await this.userRepository.findOne(
+            { id },
+            { relations: ["roles"] }
+        );
+        return user
+    }
+
     async updatePassword(password: string, newPassword: string, id: string) {
 
         const user = await this.userExists("", id);

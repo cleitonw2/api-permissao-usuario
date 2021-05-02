@@ -46,6 +46,18 @@ class UserController {
         return res.status(200).json(users);
     }
 
+    async showUserByID(req: Request, res: Response) {
+        const id = req.header;
+        
+        const user = await userService().showUserByID(String(id));
+
+        user.password = undefined;
+        user.passwordResetExpires = undefined;
+        user.passwordResetToken = undefined;
+
+        res.status(200).send(user);
+    }
+
     async updatedPassword(req: Request, res: Response) {
         const { password, newPassword } = req.body;
         const id = String(req.header);
