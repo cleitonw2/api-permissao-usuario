@@ -1,0 +1,39 @@
+<style>
+    .container {
+        width: 800px;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #center {
+        text-align: center;
+    }
+</style>
+
+<div class="container">
+    <h1 id="center">Relatorio gerado</h1>
+    <br>
+    <br>
+    <label>Vendedor: <strong>{{user.name}}</strong></label>
+    <label>Email do vendedor: <strong>{{user.email}}</strong></label>
+
+    <div>
+        {{#each products}}
+        <h2>Nome do produto: {{this.product.product_name}}</h2>
+        <p>Preço do produto: {{this.product.price}}</p>
+        <p>Código de barras: {{this.product.bar_code}}</p>
+        <p>Quantidade vendidas: {{this.product.quantity_sold}}</p>
+        <p>Quantidade em estoque: {{this.product.quantity_stock}}</p>
+        <p>Unidades vendidas pelo vendedor: {{this.unity_sold_by_seller}}</p>
+        <p>Valor total vendido R$: {{this.total_value_sold}}</p>
+        {{/each}}
+    </div>
+
+    <div id="center">Valor total das vendas R$ {{products_total_value_sold}}</div>
+
+    <p>pdf gerado no dia -- as --:-- hs</p>
+
+</div>

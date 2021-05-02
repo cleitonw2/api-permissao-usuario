@@ -47,19 +47,17 @@ class SellerService {
             user.passwordResetToken = undefined;
             user.passwordResetExpires = undefined;
 
-            let totalValueSold = 0;
-            
+            let products_total_value_sold = 0;
+
             for (let v of valueSold) {
-                totalValueSold += v
+                products_total_value_sold += v
             }
 
-            products.push({ products_total_value_sold: totalValueSold });
-
-            return { user, products };
+            return { user, products, products_total_value_sold };
         } catch (error) {
             throw new AppError(error.message);
         }
     }
 }
 
-export { SellerService }
+export { SellerService };

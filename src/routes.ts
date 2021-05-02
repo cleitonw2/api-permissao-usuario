@@ -40,6 +40,12 @@ router.get("/products/:product_name", is([user, admin]), ProductController.showP
 router.delete("/product/:id", is([admin]), ProductController.delete);
 router.post("/product/sell_product", is([user, admin]), ProductController.sellProduct);
 
+//seller
 router.get("/:user_id", is([admin]), SellerController.getSellerID);
+//generate report of all sellers
+router.get("/generate/report", is([admin]), SellerController.generateSellersReport);
+//generate report from a seller 
+router.get("/generate/report/:user_id", is([admin, user]), SellerController.generateSellerReport);
+router.get("/pdf/seller", is([admin, user]), SellerController.getSellerPDF);
 
 export { router }
