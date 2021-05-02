@@ -47,6 +47,6 @@ router.get("/:user_id", is([admin]), SellerController.getSellerID);
 router.get("/generate/report", is([admin]), SellerController.generateSellersReport);
 //generate report from a seller 
 router.get("/generate/report/:user_id", is([admin, user]), SellerController.generateSellerReport);
-router.get("/pdf/seller", is([admin, user]), SellerController.getSellerPDF);
+router.get("/pdf/seller/:pdfPath", is([admin, user]), SellerController.getSellerPDF);
 
 export { router }

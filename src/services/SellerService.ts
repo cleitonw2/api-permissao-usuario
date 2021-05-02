@@ -58,6 +58,24 @@ class SellerService {
             throw new AppError(error.message);
         }
     }
+
+    async getSellersProducts() {
+        const users = await this.userRepository.find();
+        const obj = [];
+        
+        let totalSalesAmount = 0
+        for (let user of users) {
+            let sellerProducts = await this.getSellerID(user.id);
+            obj.push(sellerProducts);
+        }
+
+        for (let userProducts of obj) {
+            totalSalesAmount += userProducts.products_total_value_sold;
+        }
+
+        obj.push({ total_sales_amount: totalSalesAmount });
+        return obj;
+    }
 }
 
 export { SellerService };
