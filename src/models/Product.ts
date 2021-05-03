@@ -29,6 +29,9 @@ class Product {
     @Column()
     quantity_sold: Number;
 
+    @Column()
+    commission_by_sales: Number;
+
     @CreateDateColumn()
     created_at: Date;
 

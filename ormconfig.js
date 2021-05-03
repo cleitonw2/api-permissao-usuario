@@ -6,10 +6,10 @@ module.exports = {
     host: process.env.DB_HOST,
     username: process.env.DB_USERNAME,
     "password": process.env.DB_PASSWORD,
-    "migrations": ["./src/database/migrations/**.ts"],
+    "migrations": ["./src/config/database/migrations/**.ts"],
     "entities": ["./src/models/**.ts"],
     "logging": false,
     "cli": {
-        "migrationsDir": "./src/database/migrations"
+        "migrationsDir": "./src/config/database/migrations"
     }
 }
