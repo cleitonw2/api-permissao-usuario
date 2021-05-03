@@ -58,6 +58,16 @@ class UserController {
         res.status(200).send(user);
     }
 
+    async updateUser(req: Request, res: Response) {
+        const id = req.header;
+        const { name, email} = req.body;
+        const user_id = String(id);
+        
+        await userService().updateUser(user_id, name, email);
+
+        return res.json("user successfully updated!");
+    }
+
     async updatedPassword(req: Request, res: Response) {
         const { password, newPassword } = req.body;
         const id = String(req.header);

@@ -120,6 +120,18 @@ class UserService {
         return user
     }
 
+    async updateUser(id: string, name: string, email?: string) {
+        try {
+            await this.userRepository.update(
+                { id },
+                { name, email }
+            );
+            return;
+        } catch (error) {
+            throw new AppError(error.message);
+        }
+    }
+
     async updatePassword(password: string, newPassword: string, id: string) {
 
         const user = await this.userExists("", id);
