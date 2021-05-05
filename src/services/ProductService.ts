@@ -24,13 +24,15 @@ class ProductService {
                 bar_code: string;
                 sold: Number;
                 stock: Number;
+                commission_by_sales: Number;
             }) => {
                 const product = this.productRepository.create({
                     product_name: p.product_name,
                     price: p.price,
                     bar_code: p.bar_code,
                     quantity_sold: p.sold,
-                    quantity_stock: p.stock
+                    quantity_stock: p.stock,
+                    commission_by_sales: p.commission_by_sales,
                 });
                 await this.productRepository.save(product);
             });
