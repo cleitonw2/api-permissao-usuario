@@ -17,7 +17,7 @@ const admin = "ROLE_ADMIN";
 router.post("/users", UserController.create);
 router.post("/login", UserController.login);
 router.post("/reset_password", UserController.reset_password);
-router.put("/update_user",is([user, admin]), UserController.updateUser);
+router.put("/update_user", is([user, admin]), UserController.updateUser);
 router.patch("/update_password", is([user, admin]), UserController.updatedPassword);
 router.get("/show", is([admin]), UserController.show);
 router.get("/show/id", is([admin, user]), UserController.showUserByID);
@@ -45,9 +45,9 @@ router.post("/product/sell_product", is([user, admin]), ProductController.sellPr
 //seller
 router.get("/:user_id", is([admin]), SellerController.getSellerID);
 //generate report of all sellers
-router.get("/generate/report", is([admin]), SellerController.generateSellersReport);
+router.post("/generate/report", is([admin]), SellerController.generateSellersReport);
 //generate report from a seller 
 router.get("/generate/report/:user_id", is([admin, user]), SellerController.generateSellerReport);
-router.get("/pdf/seller/:pdfPath", is([admin, user]), SellerController.getSellerPDF);
+router.post("/pdf/seller", is([admin, user]), SellerController.getSellerPDF);
 
 export { router }

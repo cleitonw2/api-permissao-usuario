@@ -34,6 +34,7 @@
         <p>Código de barras: {{this.product.bar_code}}</p>
         <p>Quantidade vendidas: {{this.product.quantity_sold}}</p>
         <p>Quantidade em estoque: {{this.product.quantity_stock}}</p>
+         <p>commisão por vendas: {{this.product.commission_by_sales}} %</p>
         <p>Unidades vendidas pelo vendedor: {{this.unity_sold_by_seller}}</p>
         <p>Valor total vendido R$: {{this.total_value_sold}}</p>
         {{/each}}
@@ -41,6 +42,7 @@
 
     {{#if products_total_value_sold }}
     <div id="center">Valor total das vendas feitas pelo vendedor R$ {{products_total_value_sold}}</div>
+    <div id="center">Comissão do vendedor R$ {{sellers_commission}}</div>
     {{/if}}
 
     <br>
@@ -48,6 +50,7 @@
 
     {{#if this.total_sales_amount}}
     <div id="center">Valor total arecadado com todas as vendas: R$ {{total_sales_amount}}</div>
+    <div id="center">Valor das comissões dos vendedores: R$ {{total_value_of_commissions}}</div>
     {{/if}}
 
     {{/each}}

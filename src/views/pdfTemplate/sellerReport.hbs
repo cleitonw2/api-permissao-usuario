@@ -27,12 +27,14 @@
         <p>Código de barras: {{this.product.bar_code}}</p>
         <p>Quantidade vendidas: {{this.product.quantity_sold}}</p>
         <p>Quantidade em estoque: {{this.product.quantity_stock}}</p>
+        <p>commisão por vendas: {{this.product.commission_by_sales}} %</p>
         <p>Unidades vendidas pelo vendedor: {{this.unity_sold_by_seller}}</p>
         <p>Valor total vendido R$: {{this.total_value_sold}}</p>
         {{/each}}
     </div>
 
-    <div id="center">Valor total das vendas R$ {{products_total_value_sold}}</div>
+    <div id="center">Valor total das vendas R$ {{products_total_value_sold}}</div> <br>
+    <div id="center">Sua comissão R$ {{sellers_commission}}</div>
 
     <p>pdf gerado no dia -- as --:-- hs</p>
 

@@ -12,12 +12,17 @@ class SellerController {
     async getSellerID(req: Request, res: Response) {
         const { user_id } = req.params;
 
-        const { user, products, products_total_value_sold } = await sellerService().getSellerID(user_id);
+        const { user, products, products_total_value_sold, sellers_commission } = await sellerService().getSellerID(user_id);
+
+        user.password = undefined;
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
 
         return res.status(200).json({
             user,
             products,
             products_total_value_sold,
+            sellers_commission,
         });
     }
 
@@ -26,7 +31,7 @@ class SellerController {
 
         const variables = await sellerService().getSellerID(user_id);
 
-        const downloadPath = resolve(__dirname, "..", "downloads", "SellerReport.pdf");
+        const downloadPath = resolve(__dirname, "..", "downloads", `${variables.user.email}.pdf`);
 
         const pdfTemplate = resolve(__dirname, "..", "views", "pdfTemplate", "sellerReport.hbs");
 
@@ -42,8 +47,11 @@ class SellerController {
     }
 
     async generateSellersReport(req: Request, res: Response) {
+        const { email } = req.body;
+
         const variables = await sellerService().getSellersProducts();
-        const downloadPath = resolve(__dirname, "..", "downloads", "fullSellersReport.pdf");
+
+        const downloadPath = resolve(__dirname, "..", "downloads", `${email}.pdf`);
 
         const pdfTemplate = resolve(__dirname, "..", "views", "pdfTemplate", "fullSellersReport.hbs");
 
@@ -59,19 +67,10 @@ class SellerController {
     }
 
     async getSellerPDF(req: Request, res: Response) {
-        const { pdfPath } = req.params;
+        const { email } = req.body;
 
-        if (pdfPath === "sellerReport") {
-            const pdf = resolve(__dirname, "..", "downloads", "SellerReport.pdf");
-            res.sendFile(pdf);
-        }
-        else if (pdfPath === "fullSellersReport") {
-            const pdf = resolve(__dirname, "..", "downloads", "fullSellersReport.pdf");
-            res.sendFile(pdf);
-        }
-        else{
-            res.json();
-        }
+        const pdf = resolve(__dirname, "..", "downloads", `${email}.pdf`);
+        res.sendFile(pdf);
     }
 }
 

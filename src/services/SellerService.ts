@@ -30,6 +30,7 @@ class SellerService {
 
             const products = [];
             const valueSold = [];
+            const sellersCommission = []
 
             for (let s of sellerProducts) {
                 let product = await this.productRepository.findOne({ id: s.product_id });
@@ -38,22 +39,27 @@ class SellerService {
 
                 let total_value_sold = Number(product.price) * Number(s.unity_sold);
 
+                let commission = Number(product.commission_by_sales) * total_value_sold / 100
+
                 products.push({ product, unity_sold_by_seller, total_value_sold });
 
                 valueSold.push(total_value_sold);
-            }
 
-            user.password = undefined;
-            user.passwordResetToken = undefined;
-            user.passwordResetExpires = undefined;
+                sellersCommission.push(commission);
+            }
 
             let products_total_value_sold = 0;
+            let sellers_commission = 0; // seller's commission
 
-            for (let v of valueSold) {
-                products_total_value_sold += v
+            for (let value of valueSold) {
+                products_total_value_sold += value;
             }
 
-            return { user, products, products_total_value_sold };
+            for (let commission of sellersCommission) {
+                sellers_commission += commission;
+            }
+
+            return { user, products, products_total_value_sold, sellers_commission };
         } catch (error) {
             throw new AppError(error.message);
         }
@@ -62,8 +68,10 @@ class SellerService {
     async getSellersProducts() {
         const users = await this.userRepository.find();
         const obj = [];
-        
-        let totalSalesAmount = 0
+
+        let totalSalesAmount = 0;
+        let valueOfCommissions = 0;
+
         for (let user of users) {
             let sellerProducts = await this.getSellerID(user.id);
             obj.push(sellerProducts);
@@ -71,9 +79,13 @@ class SellerService {
 
         for (let userProducts of obj) {
             totalSalesAmount += userProducts.products_total_value_sold;
+            valueOfCommissions += userProducts.sellers_commission;
         }
 
-        obj.push({ total_sales_amount: totalSalesAmount });
+        obj.push({ 
+            total_sales_amount: totalSalesAmount,
+            total_value_of_commissions: valueOfCommissions,
+         });
         return obj;
     }
 }
