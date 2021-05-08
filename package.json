@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
     "queue": "ts-node-dev --transpile-only --ignore-watch node_modules src/queue.ts",
     "typeorm": "ts-node-dev node_modules/typeorm/cli.js"
