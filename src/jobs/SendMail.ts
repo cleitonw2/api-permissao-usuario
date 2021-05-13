@@ -2,7 +2,12 @@ import SendMailService from "../services/SendMailService";
 
 export default {
     key: 'SendMail',
-    options: {},
+    options: {
+        limiter: {
+            max: 600,
+            duration: 5000
+        }
+    },
     async handle({ data }) {
         const { email, variables, npsPath } = data;
 

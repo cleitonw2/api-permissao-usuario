@@ -1,5 +1,6 @@
 import { app } from "./app";
 import dotenv from "dotenv";
+import "./queue";
 dotenv.config();
 
 const port = process.env.SERVER_PORT;
