@@ -1,28 +1,24 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class CreateUsers1614097049166 implements MigrationInterface {
+export class CreateUserTokens1620947337121 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: "users",
+                name: "user_tokens",
                 columns: [
                     {
                         name: "id",
                         type: "uuid",
-                        isPrimary: true
+                        isPrimary: true,
                     },
                     {
-                        name: "name",
-                        type: "varchar"
+                        name: "user_id",
+                        type: "uuid",
                     },
                     {
-                        name: "email",
-                        type: "varchar"
-                    },
-                    {
-                        name: "password",
-                        type: "varchar"
+                        name: "token",
+                        type: "uuid",
                     },
                     {
                         name: "created_at",
@@ -34,13 +30,23 @@ export class CreateUsers1614097049166 implements MigrationInterface {
                         type: "timestamp",
                         default: "now()",
                     },
-                ]
+                ],
+                foreignKeys: [
+                    {
+                        columnNames: ["user_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "users",
+                        name: "fk_user_tokens",
+                        onDelete: "CASCADE",
+                        onUpdate: "CASCADE",
+                    },
+                ],
             })
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("users");
+        await queryRunner.dropTable("user_tokens");
     }
 
 }

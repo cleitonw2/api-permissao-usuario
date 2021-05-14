@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class CreateProducts1614516407569 implements MigrationInterface {
 
@@ -31,6 +31,10 @@ export class CreateProducts1614516407569 implements MigrationInterface {
                     {
                         name: "quantity_sold",
                         type: "integer",
+                    },
+                    {
+                        name: "commission_by_sales",
+                        type: "numeric",
                     },
                     {
                         name: "created_at",
