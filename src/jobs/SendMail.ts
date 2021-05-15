@@ -9,8 +9,8 @@ export default {
         }
     },
     async handle({ data }) {
-        const { email, variables, npsPath } = data;
+        const { email, variables, htmlPath } = data;
 
-        await SendMailService.execute(email, variables.title, variables, npsPath);
+        await SendMailService.execute(email, variables.title, variables, htmlPath);
     },
 }

@@ -64,9 +64,7 @@ class UserService {
 
         await this.userRepository.save(user);
 
-        user.passwordResetExpires = undefined;
         user.password = undefined;
-        user.passwordResetToken = undefined;
 
         return user;
     }
@@ -94,8 +92,6 @@ class UserService {
         });
 
         user.password = undefined;
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
 
         return { user, token };
     }
@@ -105,8 +101,6 @@ class UserService {
 
         users.filter(user => {
             user.password = undefined;
-            user.passwordResetToken = undefined;
-            user.passwordResetExpires = undefined;
         });
 
         return users;
@@ -118,6 +112,10 @@ class UserService {
             { relations: ["roles"] }
         );
         return user
+    }
+
+    async showUserByEmail(email: string) {
+        return await this.userRepository.findOne({ email });
     }
 
     async updateUser(id: string, name: string, email?: string) {
@@ -134,7 +132,7 @@ class UserService {
 
     async updatePassword(password: string, newPassword: string, id: string) {
 
-        const user = await this.userExists("", id);
+        const user = await this.showUserByID(id);
 
         if (!user)
             throw new AppError("User not found!");
@@ -158,7 +156,7 @@ class UserService {
     }
 
     async deleteUser(password: string, id: string) {
-        const user = await this.userExists("", id);
+        const user = await this.showUserByID(id);
 
         if (!user)
             throw new AppError("User not found!");
@@ -173,38 +171,6 @@ class UserService {
             return true;
         } catch (error) {
             throw new AppError("It was not possible to delet the user!");
-        }
-    }
-
-    async resetPassword(email: string, token: string, password: string) {
-
-        const user = await this.userExists(email);
-
-        if (!user)
-            throw new AppError("User not found!", 401);
-
-        if (token !== user.passwordResetToken)
-            throw new AppError("Token invalid!");
-
-        const now = moment().format('YYYY-MM-DD HH:mm');
-
-        if (now > moment(user.passwordResetExpires).format('YYYY-MM-DD HH:mm'))
-            throw new AppError("Token expired, generate a new one");
-
-        const passwordHash = await this.passwordHashing(password);
-
-        try {
-            await this.userRepository.update(
-                { id: user.id },
-                {
-                    password: passwordHash,
-                    passwordResetToken: null,
-                    passwordResetExpires: null,
-                }
-            );
-            return;
-        } catch (error) {
-            throw new AppError(error.message);
         }
     }
 }

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AppError } from "../errors/AppError";
 import { UserService } from "../services/UserService";
 import * as yup from "yup";
+import { ResetPasswordService } from "../services/ResetPasswordService";
 
 
 const userService = () => new UserService();
@@ -52,8 +53,6 @@ class UserController {
         const user = await userService().showUserByID(String(id));
 
         user.password = undefined;
-        user.passwordResetExpires = undefined;
-        user.passwordResetToken = undefined;
 
         res.status(200).send(user);
     }
@@ -89,7 +88,7 @@ class UserController {
     async reset_password(req: Request, res: Response) {
         const { email, token, password } = req.body;
 
-        await userService().resetPassword(email, token, password);
+       await new ResetPasswordService().execute(email, token, password);
 
         return res.status(200).json({ message: "Password successfully updated" });
     }

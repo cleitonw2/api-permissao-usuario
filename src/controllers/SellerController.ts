@@ -15,8 +15,6 @@ class SellerController {
         const { user, products, products_total_value_sold, sellers_commission } = await sellerService().getSellerID(user_id);
 
         user.password = undefined;
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
 
         return res.status(200).json({
             user,

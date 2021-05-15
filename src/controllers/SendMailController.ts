@@ -1,52 +1,14 @@
 import { Request, Response } from "express";
-import { getCustomRepository } from "typeorm";
-import { AppError } from "../errors/AppError";
-import { UsersRepository } from "../repositories/UserRepository";
-import { resolve } from "path";
-import crypto from "crypto";
-import moment from "moment";
-import Queue from "../lib/Queue";
+import { ForgotPasswordService } from "../services/ForgotPasswordService";
+
 
 class SendMailController {
     async forgot_password(req: Request, res: Response) {
         const { email } = req.body;
 
-        const userRepository = getCustomRepository(UsersRepository);
+        const { message } = await new ForgotPasswordService().execute(email);
 
-        const user = await userRepository.findOne({ email });
-
-        if (!user)
-            throw new AppError("User not found!", 401);
-
-        const token = crypto.randomBytes(3).toString('hex');
-
-        const now = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm');
-
-        const npsPath = resolve(__dirname, "..", "views", "emails", "passwordToken.hbs");
-
-        const variables = {
-            name: user.name,
-            title: "Você esqueceu sua senha",
-            description: "Não tem problema basta utilizar o token que enviamos",
-            token
-        }
-
-        try {
-            await userRepository.update(
-                { id: user.id },
-                {
-                    passwordResetToken: token,
-                    passwordResetExpires: now
-                }
-            );
-
-            await Queue.add('SendMail', { email, variables, npsPath });
-
-            return res.status(200).json({ message: "Email sent successfully!" });
-        } catch (error) {
-
-            throw new AppError(error);
-        }
+        return res.json({ message });
     }
 }
 
