@@ -4,18 +4,20 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
+    OneToMany,
     PrimaryColumn
 } from "typeorm";
 import { v4 as uuid } from 'uuid';
 import { Role } from "./Role";
 import { Seller } from "./Seller";
+import { UserToken } from "./UserToken";
 
 @Entity("users")
 class User {
 
     constructor() {
         if (!this.id) {
-            this.id = uuid()
+            this.id = uuid();
         }
     }
 
@@ -30,12 +32,6 @@ class User {
 
     @Column()
     password: string;
-
-    @Column()
-    passwordResetToken: string;
-
-    @Column()
-    passwordResetExpires: string;
 
     @CreateDateColumn()
     created_at: Date;
@@ -54,6 +50,10 @@ class User {
     @ManyToMany(() => Seller, seller => seller.users)
     @JoinTable()
     seller: Seller[];
+
+    @OneToMany(() => UserToken, userToken => userToken.users)
+    @JoinTable()
+    userTokens: UserToken[];
 
 }
 
