@@ -2,40 +2,42 @@ import { getCustomRepository, getRepository, Repository } from "typeorm";
 import { AppError } from "../errors/AppError";
 import { Product } from "../models/Product";
 import { Seller } from "../models/Seller";
+import { User } from "../models/User";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { SellerRepository } from "../repositories/SellerRepository";
+import { UsersRepository } from "../repositories/UserRepository";
+import { UserService } from "./UserService";
 
 
 class ProductService {
 
     private productRepository: Repository<Product>;
     private sellerRepository: Repository<Seller>;
+    private userRepository: Repository<User>;
 
     constructor() {
         this.productRepository = getCustomRepository(ProductRepository);
         this.sellerRepository = getCustomRepository(SellerRepository);
+        this.userRepository = getCustomRepository(UsersRepository);
     }
 
-    async registerProducts(products: any) {
+    async registerProducts(products: Product) {
         try {
-            products.filter(async (p: {
-                product_name: string;
-                price: Number;
-                bar_code: string;
-                sold: Number;
-                stock: Number;
-                commission_by_sales: Number;
-            }) => {
-                const product = this.productRepository.create({
-                    product_name: p.product_name,
-                    price: p.price,
-                    bar_code: p.bar_code,
-                    quantity_sold: p.sold,
-                    quantity_stock: p.stock,
-                    commission_by_sales: p.commission_by_sales,
-                });
-                await this.productRepository.save(product);
+
+            const user = await this.userRepository.findByIds(products.user);
+
+            const product = this.productRepository.create({
+                product_name: products.product_name,
+                price: products.price,
+                bar_code: products.bar_code,
+                quantity_sold: products.quantity_sold,
+                quantity_stock: products.quantity_stock,
+                commission_by_sales: products.commission_by_sales,
+                allowed_membership: products.allowed_membership,
+                user: user,
             });
+            await this.productRepository.save(product);
+
             return;
         } catch (error) {
             throw new AppError(error.message);

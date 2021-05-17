@@ -5,7 +5,7 @@ const productService = () => new ProductService();
 
 class ProductController {
     async registerProducts(req: Request, res: Response) {
-        const { products } = req.body;
+        const products = req.body;
 
         await productService().registerProducts(products);
 
