@@ -13,4 +13,4 @@ class RoleController {
     }
 }
 
-export default new RoleController();
+export { RoleController };

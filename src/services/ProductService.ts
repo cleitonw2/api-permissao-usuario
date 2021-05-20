@@ -6,7 +6,6 @@ import { User } from "../models/User";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { SellerRepository } from "../repositories/SellerRepository";
 import { UsersRepository } from "../repositories/UserRepository";
-import { UserService } from "./UserService";
 
 
 class ProductService {

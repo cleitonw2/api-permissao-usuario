@@ -3,7 +3,7 @@ import { PermissionService } from "../services/PermissionService";
 
 const permissionService = () => new PermissionService();
 
-class PrermissionController {
+class PermissionController {
     async create(req: Request, res: Response) {
         const { name, description } = req.body;
 
@@ -21,11 +21,11 @@ class PrermissionController {
 
     async delete(req: Request, res: Response) {
         const { permission_id } = req.params;
-       
+
         await permissionService().delete(permission_id);
 
         return res.json("permission deleted");
     }
 }
 
-export default new PrermissionController();
+export { PermissionController };
