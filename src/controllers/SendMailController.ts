@@ -12,4 +12,4 @@ class SendMailController {
     }
 }
 
-export default new SendMailController();
+export { SendMailController };
