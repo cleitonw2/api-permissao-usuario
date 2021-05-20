@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import ProductController from './controllers/ProductController';
 import SendMailController from "./controllers/SendMailController";
 import SellerController from "./controllers/SellerController";
 import { is } from "./middlewares/permission";
@@ -12,14 +11,6 @@ const admin = "ROLE_ADMIN";
 
 //email
 router.patch("/forgot_password", SendMailController.forgot_password);
-
-//product
-router.post("/products/register", is([admin]), ProductController.registerProducts);
-router.get("/product/:product_id", is([user, admin]), ProductController.showProductByID);
-router.get("/products", is([user, admin]), ProductController.showProducts);
-router.get("/products/:product_name", is([user, admin]), ProductController.showProductsByName);
-router.delete("/product/:id", is([admin]), ProductController.delete);
-router.post("/product/sell_product", is([user, admin]), ProductController.sellProduct);
 
 //seller
 router.get("/:user_id", is([admin]), SellerController.getSellerID);
