@@ -72,4 +72,4 @@ class SellerController {
     }
 }
 
-export default new SellerController();
+export { SellerController };
