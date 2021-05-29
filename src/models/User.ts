@@ -8,6 +8,7 @@ import {
     PrimaryColumn
 } from "typeorm";
 import { v4 as uuid } from 'uuid';
+import { ProductOwner } from "./ProductOwner";
 import { Role } from "./Role";
 import { Seller } from "./Seller";
 import { UserToken } from "./UserToken";
@@ -54,6 +55,10 @@ class User {
     @OneToMany(() => UserToken, userToken => userToken.users)
     @JoinTable()
     userTokens: UserToken[];
+
+    @OneToMany(() => ProductOwner, userProductOwner=> userProductOwner.users)
+    @JoinTable()
+    userProductOwner: ProductOwner[];
 
 }
 

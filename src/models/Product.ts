@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 import { v4 as uuid } from 'uuid';
+import { ProductOwner } from "./ProductOwner";
 import { Seller } from "./Seller";
 import { User } from "./User";
 
@@ -47,12 +48,12 @@ class Product {
     seller: Seller[];
 
     @ManyToMany(() => User)
-    @JoinTable({
-        name: "product_owner",
-        joinColumns: [{ name: "product_id" }],
-        inverseJoinColumns: [{ name: "user_id" }],
-    })
+    @JoinTable()
     user: User[];
+
+    @OneToMany(() => ProductOwner, productOwner => productOwner.products)
+    @JoinTable()
+    productOwner: ProductOwner[];
 }
 
 export { Product }
