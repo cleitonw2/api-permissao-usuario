@@ -9,6 +9,8 @@ const productController = new ProductController();
 
 const user = "ROLE_USER";
 const admin = "ROLE_ADMIN";
+const owner = "ROLE_OWNER";
+const affiliated = "ROLE_AFFILIATE";
 
 router.post(
     "/products/register",
@@ -17,8 +19,7 @@ router.post(
 );
 
 router.get(
-    "/product/:product_id",
-    is([user, admin]),
+    "/product/:user_id/:product_id",
     productController.showProductByID
 );
 
