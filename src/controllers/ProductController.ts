@@ -5,16 +5,21 @@ const productService = () => new ProductService();
 
 class ProductController {
     async registerProducts(req: Request, res: Response) {
+        const id = req.header;
         const products = req.body;
+        const owner = String(id);
 
-        await productService().registerProducts(products);
+        await productService().registerProducts(products, owner);
 
         return res.status(200).json({ message: "Successfully registered products" });
     }
 
     async showProducts(req: Request, res: Response) {
+        const id = req.header;
+        const owner_id = String(id);
+        const { role } = req.body;
 
-        const productsINStock = await productService().showProducts();
+        const productsINStock = await productService().showProducts(owner_id, role);
 
         return res.status(200).json(productsINStock);
     }
@@ -36,11 +41,13 @@ class ProductController {
     }
 
     async delete(req: Request, res: Response) {
-        const { id } = req.params;
+        const { product_id } = req.params;
+        const id = req.header;
+        const user_id = String(id);
 
-        await productService().deleteProduct(id);
+        await productService().deleteProduct(product_id, user_id);
 
-        return res.status(200).json("Product deleting successfully")
+        return res.status(200).json("Product deleting successfully");
     }
 
     async sellProduct(req: Request, res: Response) {

@@ -7,14 +7,12 @@ const router = Router();
 
 const productController = new ProductController();
 
-const user = "ROLE_USER";
-const admin = "ROLE_ADMIN";
-const owner = "ROLE_OWNER";
-const affiliated = "ROLE_AFFILIATE";
+const owner = process.env.ROLE_OWNER;
+const affiliated = process.env.ROLE_AFFILIATE;
 
 router.post(
     "/products/register",
-    is([admin]),
+    is([owner]),
     productController.registerProducts
 );
 
@@ -23,27 +21,25 @@ router.get(
     productController.showProductByID
 );
 
-router.get(
+router.post(
     "/products",
-    is([user, admin]),
+    is([owner, affiliated]),
     productController.showProducts
 );
 
 router.get(
     "/products/:product_name",
-    is([user, admin]),
     productController.showProductsByName
 );
 
 router.delete(
-    "/product/:id",
-    is([admin]),
+    "/product/:product_id",
+    is([owner]),
     productController.delete
 );
 
 router.post(
     "/product/sell_product",
-    is([user, admin]),
     productController.sellProduct
 );
 
