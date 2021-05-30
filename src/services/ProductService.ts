@@ -1,66 +1,96 @@
 import { getCustomRepository, getRepository, Repository } from "typeorm";
 import { AppError } from "../errors/AppError";
 import { Product } from "../models/Product";
+import { ProductAffiliate } from "../models/ProductAffiliate";
+import { ProductOwner } from "../models/ProductOwner";
 import { Seller } from "../models/Seller";
-import { User } from "../models/User";
+import { ProductAffiliateRepository } from "../repositories/ProductAffiliateRepository";
+import { ProductOwnerRepository } from "../repositories/ProductOwnerRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { SellerRepository } from "../repositories/SellerRepository";
-import { UsersRepository } from "../repositories/UserRepository";
 
 
 class ProductService {
 
     private productRepository: Repository<Product>;
     private sellerRepository: Repository<Seller>;
-    private userRepository: Repository<User>;
+    private productOwnerRepository: Repository<ProductOwner>;
+    private productAffiliateRepository: Repository<ProductAffiliate>;
 
     constructor() {
         this.productRepository = getCustomRepository(ProductRepository);
         this.sellerRepository = getCustomRepository(SellerRepository);
-        this.userRepository = getCustomRepository(UsersRepository);
+        this.productOwnerRepository = getCustomRepository(ProductOwnerRepository);
+        this.productAffiliateRepository = getCustomRepository(ProductAffiliateRepository);
     }
 
-    async registerProducts(products: Product) {
-        try {
 
-            const user = await this.userRepository.findByIds(products.user);
+    private async isOwner(user_id: string, product_id: string) {
+        const productIDS = await this.getProductOwnerID(user_id);
 
-            const product = this.productRepository.create({
-                product_name: products.product_name,
-                price: products.price,
-                bar_code: products.bar_code,
-                quantity_sold: products.quantity_sold,
-                quantity_stock: products.quantity_stock,
-                commission_by_sales: products.commission_by_sales,
-                allowed_membership: products.allowed_membership,
-                user: user,
-            });
-            await this.productRepository.save(product);
+        const products = await this.productRepository.findByIds(productIDS);
 
-            return;
-        } catch (error) {
-            throw new AppError(error.message);
+        for (let product of products) {
+            if (product.id === product_id)
+                return true;
         }
+        return false;
+    }
+
+    private async getProductAffiliateID(user_id: string) {
+        const productOwner = await this.productAffiliateRepository.find({ user_id });
+        const products = productOwner.map(p => p.product_id);
+
+        return products;
+    }
+
+    private async getProductOwnerID(user_id: string) {
+        const productOwner = await this.productOwnerRepository.find({ user_id });
+        const products = productOwner.map(p => p.product_id);
+
+        return products;
+    }
+
+    async registerProducts(products: Product, owner: string) {
+        const product = this.productRepository.create({
+            product_name: products.product_name,
+            price: products.price,
+            bar_code: products.bar_code,
+            quantity_sold: products.quantity_sold,
+            quantity_stock: products.quantity_stock,
+            commission_by_sales: products.commission_by_sales,
+            allowed_membership: products.allowed_membership,
+        });
+
+        await this.productRepository.save(product);
+
+        const productOwner = this.productOwnerRepository.create({
+            user_id: owner,
+            product_id: product.id,
+        })
+        await this.productOwnerRepository.save(productOwner);
+        return;
     }
 
     async showProductByID(product_id: string) {
-        try {
-            return await this.productRepository.findOne({ id: product_id });
-        } catch (error) {
-            throw new AppError(error.message);
-        }
+        return await this.productRepository.findOne({ id: product_id });
     }
 
-    async showProducts() {
-        try {
-            const products = await this.productRepository.find();
+    async showProducts(user_id: string, role: string): Promise<Product[]> {
+        if (role === process.env.ROLE_OWNER) {
+            const productIDS = await this.getProductOwnerID(user_id);
+            const products = await this.productRepository.findByIds(productIDS);
             return products;
-        } catch (error) {
-            throw new AppError(error.message);
+        }
+
+        if (role === process.env.ROLE_AFFILIATE) {
+            const productIDS = await this.getProductAffiliateID(user_id);
+            const products = await this.productRepository.findByIds(productIDS);
+            return products;
         }
     }
 
-    async showProductsName(name: string) {
+    async showProductsName(name: string): Promise<Product[]> {
         try {
             const products = await getRepository(Product)
                 .createQueryBuilder("products")
@@ -73,15 +103,16 @@ class ProductService {
         }
     }
 
-    async deleteProduct(productID: string) {
-        try {
-            await this.productRepository.delete(
-                { id: productID }
-            );
-            return;
-        } catch (error) {
+    async deleteProduct(productID: string, userID: string) {
+        const is = await this.isOwner(userID, productID);
+
+        if (!is)
             throw new AppError("Error when deleting product!");
-        }
+
+        await this.productRepository.delete(
+            { id: productID }
+        );
+        return;
     }
 
     async sellProduct(product_id: string, user_id: string, unity_sold: number) {
