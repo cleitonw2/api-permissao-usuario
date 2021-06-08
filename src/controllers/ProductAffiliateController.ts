@@ -12,6 +12,17 @@ class ProductAffiliateController {
 
         return res.status(201).json(productAffiliate);
     }
+
+    async getProductAffiliates(req: Request, res: Response) {
+        const { product_id } = req.body;
+        const id = req.header;
+        const user_id = String(id);
+
+        const users = await productAffiliateService()
+            .getProductAffiliates(user_id, product_id);
+
+        res.status(200).json({ users });
+    }
 }
 
 export { ProductAffiliateController };
